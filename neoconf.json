@@ -27,6 +27,9 @@
             },
             "volar": {
                 "enabled": true
+            },
+            "jsonls": {
+                "enabled": true
             }
         }
     },
@@ -110,7 +113,7 @@
                 "unusedparams": true,
                 "unusedresult": true,
                 "unusedwrite": true,
-                "useany": true,
+                "useany": true
             },
             "useplaceholders": true,
             "gofumpt": true,
@@ -129,7 +132,7 @@
                 "test": false,
                 "tidy": true,
                 "upgrade_dependency": false,
-                "vendor": false,
+                "vendor": false
             },
             "vulncheck": "Off",
             "importShortcut": "Definition",
@@ -268,6 +271,10 @@
                 "zip",
                 "zlib"
             ]
+        },
+        "jsonls": {
+            "json.format.enable": false,
+            "json.validate.enable": true
         },
         "lemminx": {
             "xml.server.workDir": "~/.cache/lemminx",
