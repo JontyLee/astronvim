@@ -213,6 +213,7 @@ return {
     end,
   },
   { import = "astrocommunity.lsp.lsplinks-nvim" },
+  { import = "astrocommunity.lsp.lspsaga-nvim" },
   { import = "astrocommunity.lsp.nvim-lsp-file-operations" },
   { import = "astrocommunity.recipes.astrolsp-no-insert-inlay-hints" },
   --  ╭──────────────────────────────────────────────────────────╮

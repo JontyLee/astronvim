@@ -83,7 +83,14 @@ return {
         },
 
         -- comment
-        ["<Leader>/"] = { "<Cmd>lua require('Comment.api').toggle.linewise.current()<CR>", desc = "󰆉 Comment" },
+        ["<Leader>/"] = {
+          function()
+            return vim.api.nvim_get_vvar "count" == 0 and "<Plug>(comment_toggle_linewise_current)"
+              or "<Plug>(comment_toggle_linewise_count)"
+          end,
+          desc = "󰆉 Comment",
+          expr = true,
+        },
         -- neogen
         ["<Leader>a"] = { desc = "󰏫 Annotate" },
         ["<Leader>a<cr>"] = { function() require("neogen").generate {} end, desc = "Current" },
