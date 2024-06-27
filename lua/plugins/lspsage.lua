@@ -2,6 +2,10 @@ return {
   "nvimdev/lspsaga.nvim",
   branch = "main",
   event = "LspAttach",
+  dependencies = {
+    "nvim-treesitter/nvim-treesitter", -- optional
+    "nvim-tree/nvim-web-devicons", -- optional
+  },
   opts = {
     preview = {
       lines_above = 1,
