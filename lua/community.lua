@@ -9,6 +9,7 @@ return {
   -- import/override with your plugins folder
   -- { import = "astrocommunity.recipes.heirline-nvchad-statusline" },
   { import = "astrocommunity.recipes.telescope-nvchad-theme" },
+  { import = "astrocommunity.recipes.auto-session-restore" },
   --  ╭──────────────────────────────────────────────────────────╮
   --  │                      bars-and-lines                      │
   --  ╰──────────────────────────────────────────────────────────╯
@@ -170,17 +171,6 @@ return {
     "sindrets/diffview.nvim",
     opts = function(_, opts) opts.view = { merge_tool = { layout = "diff3_mixed" } } end,
   },
-  {
-    "NeogitOrg/neogit",
-    endable = false,
-    -- dependencies = {
-    --   {
-    --     "sindrets/diffview.nvim",
-    --     opts = function(_, opts) opts.view = { merge_tool = { layout = "diff3_mixed" } } end,
-    --   },
-    --   { "nvim-telescope/telescope.nvim" },
-    -- },
-  },
   { import = "astrocommunity.git.octo-nvim" },
   { import = "astrocommunity.git.openingh-nvim" },
   --  ╭──────────────────────────────────────────────────────────╮
@@ -213,7 +203,6 @@ return {
     end,
   },
   { import = "astrocommunity.lsp.lsplinks-nvim" },
-  { import = "astrocommunity.lsp.lspsaga-nvim" },
   { import = "astrocommunity.lsp.nvim-lsp-file-operations" },
   { import = "astrocommunity.recipes.astrolsp-no-insert-inlay-hints" },
   --  ╭──────────────────────────────────────────────────────────╮
@@ -243,25 +232,27 @@ return {
   --  ╰──────────────────────────────────────────────────────────╯
   -- { import = "astrocommunity.programming-language-support.dooku-nvim" },
   -- { import = "astrocommunity.programming-language-support.rest-nvim" },
-  {
-    {
-      "vhyrro/luarocks.nvim",
-      priority = 1000,
-      config = true,
-      opts = {
-        luarocks_build_args = {
-          "--with-lua-include=/usr/include",
-        },
-        rocks = { "lua-curl", "nvim-nio", "mimetypes", "xml2lua" },
-      },
-    },
-    {
-      "rest-nvim/rest.nvim",
-      ft = "http",
-      dependencies = { "luarocks.nvim" },
-      config = function() require("rest-nvim").setup() end,
-    },
-  },
+  -- {
+  --   {
+  --     "vhyrro/luarocks.nvim",
+  --     priority = 1000,
+  --     config = true,
+  --     opts = {
+  --       luarocks_build_args = {
+  --         "--with-lua-include=/usr/include",
+  --       },
+  --       rocks = { "lua-curl", "nvim-nio", "mimetypes", "xml2lua" },
+  --     },
+  --   },
+  --   {
+  --     "rest-nvim/rest.nvim",
+  --     ft = "http",
+  --     dependencies = { "luarocks.nvim" },
+  --     config = function() require("rest-nvim").setup() end,
+  --   },
+  -- },
+
+  { import = "astrocommunity.programming-language-support.nvim-jqx" },
   --  ╭──────────────────────────────────────────────────────────╮
   --  │                         project                          │
   --  ╰──────────────────────────────────────────────────────────╯
@@ -415,6 +406,7 @@ return {
   -- { import = "astrocommunity.utility.nvim-toggler" },
   { import = "astrocommunity.utility.telescope-fzy-native-nvim" },
   { import = "astrocommunity.utility.telescope-live-grep-args-nvim" },
+  { import = "astrocommunity.utility.vim-fetch" },
   --  ╭──────────────────────────────────────────────────────────╮
   --  │                         workflow                         │
   --  ╰──────────────────────────────────────────────────────────╯
