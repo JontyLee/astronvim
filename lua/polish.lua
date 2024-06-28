@@ -48,15 +48,15 @@ autocmd({ "ModeChanged" }, {
   end,
 })
 
-autocmd("TermClose", {
-  pattern = "*lazygit*",
-  callback = function()
-    vim.cmd "silent! :checktime"
-    local status_ok, _ = pcall(require, "lspconfig")
-    if not status_ok then return end
-    vim.cmd "silent! LspRestart"
-  end,
-})
+-- autocmd("TermClose", {
+--   pattern = "*lazygit*",
+--   callback = function()
+--     vim.cmd "silent! :checktime"
+--     local status_ok, _ = pcall(require, "lspconfig")
+--     if not status_ok then return end
+--     vim.cmd "silent! LspRestart"
+--   end,
+-- })
 
 vim.filetype.add {
   extension = {
