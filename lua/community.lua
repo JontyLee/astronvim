@@ -242,7 +242,26 @@ return {
   --  │              programming-language-support                │
   --  ╰──────────────────────────────────────────────────────────╯
   -- { import = "astrocommunity.programming-language-support.dooku-nvim" },
-  { import = "astrocommunity.programming-language-support.rest-nvim" },
+  -- { import = "astrocommunity.programming-language-support.rest-nvim" },
+  {
+    {
+      "vhyrro/luarocks.nvim",
+      priority = 1000,
+      config = true,
+      opts = {
+        luarocks_build_args = {
+          "--with-lua-include=/usr/include",
+        },
+        rocks = { "lua-curl", "nvim-nio", "mimetypes", "xml2lua" },
+      },
+    },
+    {
+      "rest-nvim/rest.nvim",
+      ft = "http",
+      dependencies = { "luarocks.nvim" },
+      config = function() require("rest-nvim").setup() end,
+    },
+  },
   --  ╭──────────────────────────────────────────────────────────╮
   --  │                         project                          │
   --  ╰──────────────────────────────────────────────────────────╯
