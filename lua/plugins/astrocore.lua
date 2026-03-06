@@ -35,9 +35,6 @@ return {
     sessions = {
       -- disable the auto-saving of directory sessions
       autosave = { cwd = false },
-      ignore = {
-        dirs = { vim.env.Home }, -- working directories to ignore sessions in
-      },
     },
     -- passed to `vim.filetype.add`
     filetypes = {
@@ -86,18 +83,18 @@ return {
           end),
         },
         -- auto restore previous previous directory session, remove if necessary
-        {
-          event = "VimEnter",
-          desc = "Restore previous directory session if neovim opened with no arguments",
-          nested = true, -- trigger other autocommands as buffers open
-          callback = function()
-            -- Only load the session if nvim was started with no args
-            if vim.fn.argc(-1) == 0 then
-              -- try to load a directory session using the current working directory
-              require("resession").load(get_session_name(), { dir = "dirsession", silence_errors = true })
-            end
-          end,
-        },
+        -- {
+        --   event = "VimEnter",
+        --   desc = "Restore previous directory session if neovim opened with no arguments",
+        --   nested = true, -- trigger other autocommands as buffers open
+        --   callback = function()
+        --     -- Only load the session if nvim was started with no args
+        --     if vim.fn.argc(-1) == 0 then
+        --       -- try to load a directory session using the current working directory
+        --       require("resession").load(get_session_name(), { dir = "dirsession", silence_errors = true })
+        --     end
+        --   end,
+        -- },
       },
       smoothcursor_mod_change = {
         {
@@ -198,36 +195,31 @@ return {
         ["<Leader>sm"] = { function() require("snacks").picker.marks() end, desc = "Show marks" },
         ["<Leader>st"] = { function() require("snacks").picker.todo_comments() end, desc = "Todos" },
 
-        ["<Leader>tw"] = {
-          function()
-            -- local util = require "lspconfig.util"
-            -- local project_root = util.root_pattern(".git", "compile_commands.json", ".ccls")(vim.fn.expand "%:p")
-            local cwd = vim.fn.getcwd()
-            local file = vim.fn.shellescape(vim.fn.expand "%:p") -- 转义路径
-            local line = vim.fn.line "."
-            os.execute("wecode '" .. cwd .. "' -g '" .. file .. ":" .. line .. "'")
-          end,
-          desc = "Open In Wecode",
+        ["<Leader>twn"] = {
+          function() vim.cmd "vsplit | terminal wecode" end,
+          desc = "Wecode Open",
         },
-        ["<Leader>rd"] = {
+        ["<Leader>twe"] = {
+          function() vim.cmd "!wecode '%'" end,
+          desc = "Wecode Edit File",
+        },
+        ["<Leader>ud"] = {
           "<cmd>TransferDownload<cr>",
           desc = "Download from remote server (scp)",
         },
-        ["<Leader>rf"] = {
+        ["<Leader>uf"] = {
           "<cmd>DiffRemote<cr>",
           desc = "Diff file with remote server (scp)",
         },
-
-        ["<Leader>ri"] = {
+        ["<Leader>ui"] = {
           "<cmd>TransferInit<cr>",
           desc = "Init/Edit Deployment config",
         },
-        ["<Leader>rr"] = {
+        ["<Leader>ur"] = {
           "<cmd>TransferRepeat<cr>",
           desc = "Repeat transfer command",
         },
-
-        ["<leader>ru"] = {
+        ["<Leader>uu"] = {
           "<cmd>TransferUpload<cr>",
           desc = "Upload to remote server (scp)",
         },
@@ -254,13 +246,10 @@ return {
         -- setting a mapping to false will disable it
         -- ["<C-S>"] = false,
       },
-      t = {
-        ["<C-c>"] = {
-          function()
-            vim.api.nvim_win_close(vim.api.nvim_get_current_win(), true)
-            vim.api.nvim_command "LLMAppHandler CommitMsg"
-          end,
-          desc = "AI Commit Msg",
+      v = {
+        ["<Leader>twe"] = {
+          function() vim.cmd "'<,'>w !wecode" end,
+          desc = "Wecode Edit Selection",
         },
       },
     },
