@@ -189,20 +189,10 @@ return {
         ["<Leader>gdo"] = { "<Cmd>DiffviewOpen<CR>", desc = "DiffviewOpen" },
         ["<Leader>gdt"] = { "<Cmd>DiffviewToggleFiles<CR>", desc = "DiffviewToggleFiles" },
         ["<Leader>gdr"] = { "<Cmd>DiffviewRefresh<CR>", desc = "DiffviewRefresh" },
-        ["<Leader>gg"] = { function() require("snacks").lazygit() end, desc = "LazyGit" },
 
         ["<Leader>sj"] = { function() require("snacks").picker.jumps() end, desc = "Jump files" },
         ["<Leader>sm"] = { function() require("snacks").picker.marks() end, desc = "Show marks" },
         ["<Leader>st"] = { function() require("snacks").picker.todo_comments() end, desc = "Todos" },
-
-        ["<Leader>twn"] = {
-          function() vim.cmd "vsplit | terminal wecode" end,
-          desc = "Wecode Open",
-        },
-        ["<Leader>twe"] = {
-          function() vim.cmd "!wecode '%'" end,
-          desc = "Wecode Edit File",
-        },
         ["<Leader>ud"] = {
           "<cmd>TransferDownload<cr>",
           desc = "Download from remote server (scp)",
@@ -246,11 +236,8 @@ return {
         -- setting a mapping to false will disable it
         -- ["<C-S>"] = false,
       },
-      v = {
-        ["<Leader>twe"] = {
-          function() vim.cmd "'<,'>w !wecode" end,
-          desc = "Wecode Edit Selection",
-        },
+      t = {
+        ["<Esc>"] = { [[<C-\><C-n>]] },
       },
     },
   },

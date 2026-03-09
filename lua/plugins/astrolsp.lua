@@ -31,7 +31,6 @@ return {
       },
       disabled = { -- disable formatting capabilities for the listed language servers
         "lua_ls",
-        -- "gopls",
         "intelephense",
       },
       timeout_ms = 3200, -- default format timeout
@@ -40,7 +39,9 @@ return {
       -- end
     },
     -- enable servers that you already have installed without mason
-    servers = {},
+    servers = {
+      "gopls",
+    },
     -- customize language server configuration options passed to `lspconfig`
     ---@diagnostic disable: missing-fields
     config = {
