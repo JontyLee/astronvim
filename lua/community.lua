@@ -9,26 +9,6 @@ return {
   { import = "astrocommunity.recipes.picker-nvchad-theme" },
   { import = "astrocommunity.recipes.diagnostic-virtual-lines-current-line" },
 
-  { import = "astrocommunity.completion.avante-nvim" },
-  {
-    "yetone/avante.nvim",
-    ---@module 'avante'
-    ---@type avante.Config
-    opts = {
-      -- 在此处添加任何选项
-      -- 例如
-      provider = "wecode",
-      providers = {
-        wecode = {
-          __inherited_from = "claude",
-          endpoint = "http://127.0.0.1:3456",
-          model = "claude-glm-5",
-          timeout = 30000, -- Timeout in milliseconds
-          api_key_name = "ANTHROPIC_API_KEY",
-        },
-      },
-    },
-  },
   --  ╭──────────────────────────────────────────────────────────╮
   --  │                      bars-and-lines                      │
   --  ╰──────────────────────────────────────────────────────────╯

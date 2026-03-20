@@ -16,7 +16,7 @@ return {
         "docker-compose-language-service",
         "dockerfile-language-server",
         -- go
-        -- "gopls",
+        "gopls",
         "delve",
         -- "gofumpt",
         -- "goimports-reviser",
