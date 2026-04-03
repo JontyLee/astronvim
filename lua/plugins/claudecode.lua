@@ -26,11 +26,22 @@ return {
       terminal_cmd = "wecode",
       focus_after_send = true,
       terminal = {
-        split_side = "right", -- "left" or "right"
-        split_width_percentage = 0.40,
-        provider = "snacks", -- "auto", "snacks", "native", "external", "none", or custom provider table
+        split_side = "right",
+        split_width_percentage = 0.45, -- 恢复并微调到 45% 宽度
+        provider = "snacks",
         auto_close = true,
-        snacks_win_opts = {}, -- Opts to pass to `Snacks.terminal.open()` - see Floating Window section below
+        -- 修正 snacks 窗口配置，删除错误的全局变量 laststatus
+        snacks_win_opts = {
+          wo = {
+            winfixwidth = true,
+            number = false,
+            relativenumber = false,
+            signcolumn = "no",
+            statuscolumn = "",
+            foldcolumn = "0",
+            winbar = "",
+          },
+        },
         cwd_provider = function(ctx)
           -- Prefer repo root; fallback to file's directory
           local cwd = require("claudecode.cwd").git_root(ctx.file_dir or ctx.cwd) or ctx.file_dir or ctx.cwd

@@ -131,6 +131,7 @@ return {
         wrap = false, -- sets vim.opt.wrap
         shiftwidth = 4,
         tabstop = 4,
+        expandtab = true,
         pumblend = 4,
         guifont = "Maple Mono NF CN:h20",
         autoread = true,

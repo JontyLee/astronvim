@@ -293,7 +293,7 @@ return {
       --       if #clients == 0 then return end
       --
       --       for _, client in ipairs(clients) do
-      --         client.notify("workspace/didChangeWatchedFiles", {
+      --         client:notify("workspace/didChangeWatchedFiles", {
       --           changes = {
       --             { uri = vim.uri_from_fname(vim.fn.getcwd()), type = 3 }, -- 3 表示目录变更
       --           },
