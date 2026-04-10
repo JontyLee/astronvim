@@ -13,42 +13,11 @@ return {
     -- Helper to execute kitty commands
     local function kitty_exec(args) vim.fn.jobstart(vim.list_extend({ "kitty", "@" }, args), { detach = true }) end
 
-    -- Get raw JSON of kitty tabs for precise matching
-    local function get_kitty_tabs()
-      local handle = io.popen "kitty @ ls 2>/dev/null"
-      if not handle then return "" end
-      local result = handle:read "*a"
-      handle:close()
-      return result or ""
-    end
-
-    -- Open a path in a new tab or focus it if already open
-    local function open_or_focus(path)
-      local name = vim.fn.fnamemodify(path, ":t")
-      local tabs = get_kitty_tabs()
-
-      -- Check if a tab with this title exists (simple check, could be improved with JSON parsing)
-      if tabs ~= "" and tabs:find('"title": "' .. name .. '"', 1, true) then
-        kitty_exec { "focus-tab", "--match", "title:" .. name }
-      else
-        -- Launch a new tab with nvim in that directory
-        kitty_exec {
-          "launch",
-          "--type=tab",
-          "--tab-title",
-          name,
-          "--cwd",
-          path,
-          "nvim",
-        }
-      end
-    end
-
     return {
       -- Path where worktrees are created (e.g., ".." means parent of current project)
       worktree_path = "..",
       -- Command to run when switching worktrees if no buffer is available
-      switch_file_command = "Ex",
+      switch_file_command = false,
       -- Use tab-local directory
       hooks = {
         on_switch = function(_, to)
@@ -57,20 +26,11 @@ return {
           -- 2. Sync Kitty tab title
           local name = vim.fn.fnamemodify(to, ":t")
           kitty_exec { "set-tab-title", name }
-          -- 3. Restore session (Safe check for common session commands)
-          if vim.fn.exists ":SessionRestore" == 2 then
-            vim.cmd "silent! SessionRestore"
-          elseif pcall(require, "resession") then
-            -- Fallback for AstroNvim/resession users
-            require("resession").load(vim.fn.getcwd(), { dir = "dirsession", silence_errors = true })
-          end
-          -- 4. Notify user
+          -- 3. Notify user
           snacks.notify("Switched to worktree: " .. name, { title = "Worktree" })
         end,
-        on_add = function(name, path)
+        on_add = function(name, _)
           snacks.notify("Worktree created: " .. name, { type = "success", title = "Worktree" })
-          -- Automatically open/focus in Kitty after creation
-          open_or_focus(path)
         end,
       },
     }

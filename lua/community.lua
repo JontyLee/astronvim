@@ -7,7 +7,7 @@ return {
   "AstroNvim/astrocommunity",
   { import = "astrocommunity.recipes.astrolsp-no-insert-inlay-hints" },
   { import = "astrocommunity.recipes.picker-nvchad-theme" },
-  { import = "astrocommunity.recipes.diagnostic-virtual-lines-current-line" },
+  -- { import = "astrocommunity.recipes.diagnostic-virtual-lines-current-line" },
   --  ╭──────────────────────────────────────────────────────────╮
   --  │                      bars-and-lines                      │
   --  ╰──────────────────────────────────────────────────────────╯
