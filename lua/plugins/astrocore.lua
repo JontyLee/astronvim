@@ -12,6 +12,9 @@ local get_session_name = function()
   end
 end
 
+local og_virt_text
+local og_virt_line
+
 ---@type LazySpec
 return {
   "AstroNvim/astrocore",
@@ -24,6 +27,7 @@ return {
       cmp = true, -- enable completion at start
       highlighturl = true, -- highlight URLs at start
       notifications = true, -- enable notifications at start
+      diagnostics = true,
       signature_help = true,
     },
     git_worktrees = {
@@ -55,7 +59,83 @@ return {
       },
     },
 
+    treesitter = {
+      indent = true, -- enable/disable treesitter based indentation
+      auto_install = true, -- enable/disable automatic installation of detected languages
+      ensure_installed = {
+        "lua",
+        "vim",
+        "go",
+        "gomod",
+        "gosum",
+        "gowork",
+        "gotmpl",
+        "json",
+        "jsonc",
+        "php",
+        "javascript",
+        "vue",
+        "typescript",
+        "css",
+        "html",
+        "http",
+        "yaml",
+        "xml",
+        "dockerfile",
+        "bash",
+        "markdown",
+        "markdown_inline",
+        "toml",
+      },
+    },
+
+    diagnostics = {
+      virtual_text = true,
+      virtual_lines = { current_line = true },
+      underline = true,
+      update_in_insert = false,
+    },
+
     autocmds = {
+      diagnostic_only_virtlines = {
+        {
+          event = { "CursorMoved", "DiagnosticChanged" },
+          callback = function()
+            local bufnr = vim.api.nvim_get_current_buf()
+            if not require("astrocore.buffer").is_valid(bufnr) or vim.bo[bufnr].buftype == "terminal" then return end
+
+            -- 1. 捕捉原始配置            if og_virt_line == nil then og_virt_line = vim.diagnostic.config().virtual_lines end
+            if og_virt_text == nil then og_virt_text = vim.diagnostic.config().virtual_text end
+
+            -- 2. 检查功能是否启用
+            if not (og_virt_line and og_virt_line.current_line) then return end
+
+            -- 3. 计算当前行是否有诊断
+            local lnum = vim.api.nvim_win_get_cursor(0)[1] - 1
+            local has_diagnostics = not vim.tbl_isempty(vim.diagnostic.get(bufnr, { lnum = lnum }))
+            local new_virt_text_state = not has_diagnostics and og_virt_text or false
+
+            -- 4. 性能优化：只有在配置确实需要变化时才调用 config
+            -- config() 是全局刷新，非常昂贵，且容易触发无效 buffer 的 Bug
+            -- 修复：通过传入 bufnr 参数，仅针对当前 buffer 修改配置，避免全局刷新
+            local current_state = vim.diagnostic.config(nil, bufnr).virtual_text
+            if vim.inspect(current_state) ~= vim.inspect(new_virt_text_state) then
+              -- 使用 pcall 屏蔽 Neovim 内部刷新无效缓冲区时的错误 (Invalid buffer id)
+              pcall(vim.diagnostic.config, { virtual_text = new_virt_text_state }, bufnr)
+            end
+          end,
+        },
+        {
+          event = "ModeChanged",
+          callback = function()
+            local bufnr = vim.api.nvim_get_current_buf()
+            if require("astrocore.buffer").is_valid(bufnr) then
+              -- 同样使用 pcall 保证稳定性
+              pcall(vim.diagnostic.show, nil, bufnr)
+            end
+          end,
+        },
+      },
       insert_level_auto_save = {
         {
           event = { "InsertLeave", "TextChanged" },
@@ -67,8 +147,54 @@ return {
       sync_outer_change = {
         {
           event = { "BufEnter", "CursorHold", "CursorHoldI", "FocusGained" },
-          command = "if mode() != 'c' | checktime | endif",
+          callback = function()
+            if vim.fn.mode() ~= "c" then
+              vim.schedule(function()
+                -- 增加对无效 buffer 和特殊窗口的过滤，进一步防止 E565
+                local bufnr = vim.api.nvim_get_current_buf()
+                if not vim.api.nvim_buf_is_valid(bufnr) or vim.bo[bufnr].buftype == "terminal" then return end
+                pcall(vim.cmd, "checktime")
+              end)
+            end
+          end,
           pattern = { "*" },
+        },
+      },
+      lsp_reload_on_change = {
+        {
+          event = "FileChangedShellPost",
+          callback = function(args)
+            if not vim.api.nvim_buf_is_valid(args.buf) then return end
+            -- 如果缓冲区已经有本地修改，不做任何事，让用户处理冲突
+            if vim.bo[args.buf].modified then return end
+
+            -- 关键优化：不再手动触发 BufReadPost 或任何重型的 LSP 刷新
+            -- 当 checktime 加载新内容后，Neovim 的内置 LSP 监听器会自动、异步地同步变更。
+            -- 我们只做一个轻量级的通知，告知用户文件已同步。
+            vim.schedule(function()
+              if vim.api.nvim_buf_is_valid(args.buf) then
+                vim.notify(
+                  "File updated by external tool.",
+                  vim.log.levels.INFO,
+                  { title = "AstroCore", render = "minimal" }
+                )
+              end
+            end)
+          end,
+        },
+        {
+          event = "User",
+          pattern = "GitSignsUpdate",
+          callback = function()
+            if vim.fn.mode() ~= "c" then
+              -- 使用 schedule 避免在 textlock 期间执行 checktime 导致 E565 错误
+              vim.schedule(function()
+                local bufnr = vim.api.nvim_get_current_buf()
+                if not vim.api.nvim_buf_is_valid(bufnr) or vim.bo[bufnr].buftype == "terminal" then return end
+                pcall(vim.cmd, "checktime")
+              end)
+            end
+          end,
         },
       },
       git_branch_sessions = {
@@ -135,6 +261,8 @@ return {
         pumblend = 4,
         guifont = "Maple Mono NF CN:h20",
         autoread = true,
+        updatetime = 250,
+        winborder = "none",
       },
       g = { -- vim.g.<key>
         -- configure global vim variables (vim.g)

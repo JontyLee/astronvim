@@ -7,12 +7,6 @@ return {
   opts = function()
     local snacks = require "snacks"
 
-    -- ================================
-    -- 🐱 Kitty Terminal Integration
-    -- ================================
-    -- Helper to execute kitty commands
-    local function kitty_exec(args) vim.fn.jobstart(vim.list_extend({ "kitty", "@" }, args), { detach = true }) end
-
     return {
       -- Path where worktrees are created (e.g., ".." means parent of current project)
       worktree_path = "..",
@@ -23,14 +17,26 @@ return {
         on_switch = function(_, to)
           -- 1. Ensure tab-local directory is updated
           vim.cmd("tcd " .. to)
-          -- 2. Sync Kitty tab title
+          -- 2. Notify user
           local name = vim.fn.fnamemodify(to, ":t")
-          kitty_exec { "set-tab-title", name }
-          -- 3. Notify user
           snacks.notify("Switched to worktree: " .. name, { title = "Worktree" })
         end,
-        on_add = function(name, _)
-          snacks.notify("Worktree created: " .. name, { type = "success", title = "Worktree" })
+        on_add = function(name, path, _)
+          local source = vim.fn.getcwd()
+          local target = vim.fn.fnamemodify(path, ":p")
+          local hidden_files = vim.fn.globpath(source, ".*", true, true)
+          local copied = false
+          for _, file in ipairs(hidden_files) do
+            local base = vim.fn.fnamemodify(file, ":t")
+            -- 排除 . 和 .. 以及所有以 .git 开头的文件/目录
+            if base ~= "." and base ~= ".." and not base:match "^%.git" then
+              vim.fn.jobstart({ "cp", "-r", file, target })
+              copied = true
+            end
+          end
+          local msg = "Worktree created: " .. name
+          if copied then msg = msg .. "\nCopied hidden files/dirs from source" end
+          snacks.notify(msg, { type = "success", title = "Worktree" })
         end,
       },
     }
@@ -56,12 +62,5 @@ return {
 
     -- Remove worktree
     vim.keymap.set("n", "<leader>gwd", function() snacks.picker "worktrees_remove" end, { desc = "Remove worktree" })
-
-    -- Sync current Kitty tab title to match worktree
-    vim.keymap.set("n", "<leader>gwo", function()
-      local name = vim.fn.fnamemodify(vim.fn.getcwd(), ":t")
-      vim.fn.jobstart({ "kitty", "@", "set-tab-title", name }, { detach = true })
-      snacks.notify("Kitty tab title updated to: " .. name, { title = "Kitty" })
-    end, { desc = "Sync Kitty tab title" })
   end,
 }

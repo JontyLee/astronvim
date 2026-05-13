@@ -14,6 +14,13 @@ return {
   { import = "astrocommunity.bars-and-lines.dropbar-nvim" },
   { import = "astrocommunity.bars-and-lines.smartcolumn-nvim" },
   { import = "astrocommunity.bars-and-lines.vim-illuminate" },
+  {
+    "RRethy/vim-illuminate",
+    opts = function(_, opts)
+      opts.providers = { "regex" } -- only use regex to avoid heavy lifting and bugs in TS/LSP providers
+      return opts
+    end,
+  },
   --  ╭──────────────────────────────────────────────────────────╮
   --  │                       code-runner                        │
   --  ╰──────────────────────────────────────────────────────────╯
@@ -47,7 +54,6 @@ return {
   --  ╰──────────────────────────────────────────────────────────╯
   { import = "astrocommunity.editing-support.comment-box-nvim" },
   { import = "astrocommunity.editing-support.hypersonic-nvim" },
-  -- { import = "astrocommunity.editing-support.nvim-treesitter-context" },
   { import = "astrocommunity.editing-support.rainbow-delimiters-nvim" },
   { import = "astrocommunity.editing-support.quick-scope" },
   { import = "astrocommunity.editing-support.suda-vim" },
@@ -154,7 +160,6 @@ return {
   --  ╭──────────────────────────────────────────────────────────╮
   --  │                           lsp                            │
   --  ╰──────────────────────────────────────────────────────────╯
-  { import = "astrocommunity.lsp.lsp-signature-nvim" },
   { import = "astrocommunity.lsp.nvim-lsp-endhints" },
   --  ╭──────────────────────────────────────────────────────────╮
   --  │                    markdown-and-latex                    │

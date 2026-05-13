@@ -283,26 +283,6 @@ return {
       },
       -- add a component for the current git branch if it exists and use no separator for the sections
       status.component.git_branch { surround = { separator = "none" } },
-      -- status.component.git_branch {
-      --   surround = { separator = "none" },
-      --   update = {
-      --     "User",
-      --     pattern = { "GitSignsUpdate", "GitSignsChanged" },
-      --     callback = function()
-      --       local clients = vim.lsp.get_clients()
-      --       if #clients == 0 then return end
-      --
-      --       for _, client in ipairs(clients) do
-      --         client:notify("workspace/didChangeWatchedFiles", {
-      --           changes = {
-      --             { uri = vim.uri_from_fname(vim.fn.getcwd()), type = 3 }, -- 3 表示目录变更
-      --           },
-      --         })
-      --       end
-      --       vim.schedule(vim.cmd.redrawstatus)
-      --     end,
-      --   },
-      -- },
       status.component.grapple,
       -- add a component for the current git diff if it exists and use no separator for the sections
       status.component.git_diff { padding = { left = 1 }, surround = { separator = "none" } },
