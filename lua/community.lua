@@ -9,6 +9,9 @@ return {
   { import = "astrocommunity.recipes.picker-nvchad-theme" },
   -- { import = "astrocommunity.recipes.diagnostic-virtual-lines-current-line" },
   --  ╭──────────────────────────────────────────────────────────╮
+  --  │                           ai                             │
+  --  ╰──────────────────────────────────────────────────────────╯
+  --  ╭──────────────────────────────────────────────────────────╮
   --  │                      bars-and-lines                      │
   --  ╰──────────────────────────────────────────────────────────╯
   { import = "astrocommunity.bars-and-lines.dropbar-nvim" },
@@ -27,6 +30,7 @@ return {
   --  ╭──────────────────────────────────────────────────────────╮
   --  │                          color                           │
   --  ╰──────────────────────────────────────────────────────────╯
+  { import = "astrocommunity.color.transparent-nvim" },
   --  ╭──────────────────────────────────────────────────────────╮
   --  │                       colorscheme                        │
   --  ╰──────────────────────────────────────────────────────────╯
@@ -54,6 +58,7 @@ return {
   --  ╰──────────────────────────────────────────────────────────╯
   { import = "astrocommunity.editing-support.comment-box-nvim" },
   { import = "astrocommunity.editing-support.hypersonic-nvim" },
+  { import = "astrocommunity.editing-support.mcphub-nvim" },
   { import = "astrocommunity.editing-support.rainbow-delimiters-nvim" },
   { import = "astrocommunity.editing-support.quick-scope" },
   { import = "astrocommunity.editing-support.suda-vim" },
