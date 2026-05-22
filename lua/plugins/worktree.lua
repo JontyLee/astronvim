@@ -22,20 +22,29 @@ return {
           snacks.notify("Switched to worktree: " .. name, { title = "Worktree" })
         end,
         on_add = function(name, path, _)
-          local source = vim.fn.getcwd()
+          local source = vim.fn.system({ "git", "rev-parse", "--show-toplevel" }):gsub("%s+$", "")
           local target = vim.fn.fnamemodify(path, ":p")
-          local hidden_files = vim.fn.globpath(source, ".*", true, true)
-          local copied = false
-          for _, file in ipairs(hidden_files) do
-            local base = vim.fn.fnamemodify(file, ":t")
-            -- 排除 . 和 .. 以及所有以 .git 开头的文件/目录
-            if base ~= "." and base ~= ".." and not base:match "^%.git" then
-              vim.fn.jobstart({ "cp", "-r", file, target })
-              copied = true
-            end
+
+          local untracked = vim.fn.system({ "git", "-C", source, "ls-files", "--others", "--exclude-standard" })
+          if vim.v.shell_error ~= 0 then
+            snacks.notify("Worktree created: " .. name, { type = "success", title = "Worktree" })
+            return
           end
+
+          local files = vim.split(untracked, "\n", { trimempty = true })
+
+          local copied = false
+          for _, file in ipairs(files) do
+            local src = source .. "/" .. file
+            local dst = target .. "/" .. file
+            local dir = vim.fn.fnamemodify(dst, ":h")
+            vim.fn.mkdir(dir, "p")
+            vim.fn.system({ "cp", "-r", src, dst })
+            copied = true
+          end
+
           local msg = "Worktree created: " .. name
-          if copied then msg = msg .. "\nCopied hidden files/dirs from source" end
+          if copied then msg = msg .. "\nCopied untracked files from source" end
           snacks.notify(msg, { type = "success", title = "Worktree" })
         end,
       },
@@ -58,7 +67,9 @@ return {
     end, { desc = "List worktrees" })
 
     -- Create new worktree (with branch selection)
-    vim.keymap.set("n", "<leader>gwc", function() snacks.picker "worktrees_new" end, { desc = "Create worktree" })
+    vim.keymap.set("n", "<leader>gwc", function()
+      snacks.picker("worktrees_new", { show_empty = true })
+    end, { desc = "Create worktree" })
 
     -- Remove worktree
     vim.keymap.set("n", "<leader>gwd", function() snacks.picker "worktrees_remove" end, { desc = "Remove worktree" })

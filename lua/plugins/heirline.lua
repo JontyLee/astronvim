@@ -63,6 +63,8 @@ local colors = {
   git_add = utils.get_highlight("diffAdded").fg,
   git_change = utils.get_highlight("diffChanged").fg,
 }
+local solid_bg = "#1e1e2e" -- catppuccin-mocha base, used instead of "bg" to avoid transparent.nvim clearing it
+
 local mode_names = { -- change the strings if you like it vvvvverbose!
   n = "N",
   no = "N?",
@@ -101,25 +103,25 @@ local mode_names = { -- change the strings if you like it vvvvverbose!
 }
 -- Color table for highlights
 local mode_color = {
-  n = colors.diag_info,
-  i = colors.diag_warn,
-  v = colors.diag_error,
-  V = colors.blue,
-  c = colors.cyan,
-  no = colors.green,
-  s = colors.orange,
-  S = colors.orange,
-  [""] = colors.orange,
-  ic = colors.diag_warn,
-  R = colors.diag_hint,
-  Rv = colors.diag_hint,
-  cv = colors.cyan,
-  ce = colors.cyan,
-  r = colors.cyan,
-  rm = colors.cyan,
-  ["r?"] = colors.cyan,
-  ["!"] = colors.red,
-  t = colors.red,
+  n = "#89b4fa", -- bright blue
+  i = "#a6e3a1", -- bright green
+  v = "#f38ba8", -- bright pink
+  V = "#cba6f7", -- bright purple
+  c = "#f9e2af", -- bright yellow
+  no = "#94e2d5", -- teal
+  s = "#fab387", -- peach
+  S = "#fab387",
+  [""] = "#fab387",
+  ic = "#a6e3a1",
+  R = "#f5c2e7", -- pink
+  Rv = "#f5c2e7",
+  cv = "#f9e2af",
+  ce = "#f9e2af",
+  r = "#f9e2af",
+  rm = "#f9e2af",
+  ["r?"] = "#f9e2af",
+  ["!"] = "#f38ba8",
+  t = "#f38ba8",
 }
 --
 local show_mode_color = function()
@@ -230,7 +232,7 @@ return {
         -- enable mode text with padding as well as an icon before it
         -- mode_text = { icon = { kind = custom_mod_icon(), padding = { right = 1, left = 1 } } },
         -- surround the component with a separators
-        hl = { fg = "bg" },
+        hl = { fg = solid_bg, bold = true },
         surround = {
           -- it's a left element, so use the left separator
           separator = "left",
@@ -244,13 +246,13 @@ return {
       },
       status.component.builder {
         { provider = "" },
-        hl = function() return { fg = show_mode_color() } end,
+        hl = function() return { fg = show_mode_color(), bold = true } end,
         surround = {
           separator = "left",
           color = function()
             return {
               main = show_mode_color(),
-              right = "blank_bg",
+              right = "fg",
             }
           end,
         },
@@ -319,7 +321,7 @@ return {
       status.component.builder {
         { provider = "" },
         padding = { right = 1 },
-        hl = { fg = "bg" },
+        hl = { fg = solid_bg },
         surround = { separator = "right", color = { main = "nav_icon_bg" } },
       },
       status.component.file_info {

@@ -7,7 +7,7 @@ return {
   "AstroNvim/astrocommunity",
   { import = "astrocommunity.recipes.astrolsp-no-insert-inlay-hints" },
   { import = "astrocommunity.recipes.picker-nvchad-theme" },
-  -- { import = "astrocommunity.recipes.diagnostic-virtual-lines-current-line" },
+  { import = "astrocommunity.recipes.diagnostic-virtual-lines-current-line" },
   --  ╭──────────────────────────────────────────────────────────╮
   --  │                           ai                             │
   --  ╰──────────────────────────────────────────────────────────╯
@@ -34,7 +34,7 @@ return {
   --  ╭──────────────────────────────────────────────────────────╮
   --  │                       colorscheme                        │
   --  ╰──────────────────────────────────────────────────────────╯
-  { import = "astrocommunity.colorscheme.dracula-nvim" },
+  { import = "astrocommunity.colorscheme.catppuccin" },
   --  ╭──────────────────────────────────────────────────────────╮
   --  │                         comment                          │
   --  ╰──────────────────────────────────────────────────────────╯
@@ -47,7 +47,7 @@ return {
   { import = "astrocommunity.debugging.nvim-dap-repl-highlights" },
   { import = "astrocommunity.debugging.nvim-dap-virtual-text" },
   { import = "astrocommunity.debugging.persistent-breakpoints-nvim" },
-  --  ╭──────────────────────────────────────────────────────────╮
+  --  ╭───────────────────────────────────────────────╮
   --  │                       diagnostics                        │
   --  ╰──────────────────────────────────────────────────────────╯
   -- ╭─────────────────────────────────────────────────────────╮
@@ -56,6 +56,7 @@ return {
   --  ╭──────────────────────────────────────────────────────────╮
   --  │                     editing-support                      │
   --  ╰──────────────────────────────────────────────────────────╯
+  { import = "astrocommunity.editing-support.auto-save-nvim" },
   { import = "astrocommunity.editing-support.comment-box-nvim" },
   { import = "astrocommunity.editing-support.hypersonic-nvim" },
   { import = "astrocommunity.editing-support.mcphub-nvim" },

@@ -1,7 +1,3 @@
--- NOTE: We highly recommend setting up the Lua Language Server (`:LspInstall lua_ls`)
---       as this provides autocomplete and documentation while editing
-
--- function for calculating the current session name
 local get_session_name = function()
   local name = vim.fn.getcwd()
   local branch = vim.fn.system "git branch --show-current"
@@ -12,8 +8,8 @@ local get_session_name = function()
   end
 end
 
-local og_virt_text
-local og_virt_line
+-- local og_virt_text
+-- local og_virt_line
 
 ---@type LazySpec
 return {
@@ -97,91 +93,117 @@ return {
     },
 
     autocmds = {
-      diagnostic_only_virtlines = {
+      -- first key is the augroup name
+      heirline_colors = {
         {
-          event = { "CursorMoved", "DiagnosticChanged" },
+          event = "User",
+          pattern = "AstroColorScheme",
+          desc = "Refresh heirline colors",
           callback = function()
-            local bufnr = vim.api.nvim_get_current_buf()
-            if not require("astrocore.buffer").is_valid(bufnr) or vim.bo[bufnr].buftype == "terminal" then return end
-
-            -- 1. 捕捉原始配置            if og_virt_line == nil then og_virt_line = vim.diagnostic.config().virtual_lines end
-            if og_virt_text == nil then og_virt_text = vim.diagnostic.config().virtual_text end
-
-            -- 2. 检查功能是否启用
-            if not (og_virt_line and og_virt_line.current_line) then return end
-
-            -- 3. 计算当前行是否有诊断
-            local lnum = vim.api.nvim_win_get_cursor(0)[1] - 1
-            local has_diagnostics = not vim.tbl_isempty(vim.diagnostic.get(bufnr, { lnum = lnum }))
-            local new_virt_text_state = not has_diagnostics and og_virt_text or false
-
-            -- 4. 性能优化：只有在配置确实需要变化时才调用 config
-            -- config() 是全局刷新，非常昂贵，且容易触发无效 buffer 的 Bug
-            -- 修复：通过传入 bufnr 参数，仅针对当前 buffer 修改配置，避免全局刷新
-            local current_state = vim.diagnostic.config(nil, bufnr).virtual_text
-            if vim.inspect(current_state) ~= vim.inspect(new_virt_text_state) then
-              -- 使用 pcall 屏蔽 Neovim 内部刷新无效缓冲区时的错误 (Invalid buffer id)
-              pcall(vim.diagnostic.config, { virtual_text = new_virt_text_state }, bufnr)
-            end
-          end,
-        },
-        {
-          event = "ModeChanged",
-          callback = function()
-            local bufnr = vim.api.nvim_get_current_buf()
-            if require("astrocore.buffer").is_valid(bufnr) then
-              -- 同样使用 pcall 保证稳定性
-              pcall(vim.diagnostic.show, nil, bufnr)
-            end
+            if package.loaded["heirline"] then require("astroui.status.heirline").refresh_colors() end
           end,
         },
       },
-      insert_level_auto_save = {
+      terminal_settings = {
+        -- the value is a list of autocommands to create
         {
-          event = { "InsertLeave", "TextChanged" },
-          pattern = { "*" },
-          command = "silent! wall",
-          nested = true,
-        },
-      },
-      sync_outer_change = {
-        {
-          event = { "BufEnter", "CursorHold", "CursorHoldI", "FocusGained" },
+          -- event is added here as a string or a list-like table of events
+          event = "TermOpen",
+          -- the rest of the autocmd options (:h nvim_create_autocmd)
+          desc = "Disable line number/fold column/sign column for terminals",
           callback = function()
-            if vim.fn.mode() ~= "c" then
-              vim.schedule(function()
-                -- 增加对无效 buffer 和特殊窗口的过滤，进一步防止 E565
-                local bufnr = vim.api.nvim_get_current_buf()
-                if not vim.api.nvim_buf_is_valid(bufnr) or vim.bo[bufnr].buftype == "terminal" then return end
-                pcall(vim.cmd, "checktime")
-              end)
-            end
+            vim.opt_local.number = false
+            vim.opt_local.relativenumber = false
+            vim.opt_local.foldcolumn = "0"
+            vim.opt_local.signcolumn = "no"
           end,
-          pattern = { "*" },
         },
       },
+      -- diagnostic_only_virtlines = {
+      --   {
+      --     event = { "CursorMoved", "DiagnosticChanged" },
+      --     callback = function()
+      --       local bufnr = vim.api.nvim_get_current_buf()
+      --       if not require("astrocore.buffer").is_valid(bufnr) or vim.bo[bufnr].buftype == "terminal" then return end
+      --
+      --       -- 1. 捕捉原始配置            if og_virt_line == nil then og_virt_line = vim.diagnostic.config().virtual_lines end
+      --       if og_virt_text == nil then og_virt_text = vim.diagnostic.config().virtual_text end
+      --
+      --       -- 2. 检查功能是否启用
+      --       if not (og_virt_line and og_virt_line.current_line) then return end
+      --
+      --       -- 3. 计算当前行是否有诊断
+      --       local lnum = vim.api.nvim_win_get_cursor(0)[1] - 1
+      --       local has_diagnostics = not vim.tbl_isempty(vim.diagnostic.get(bufnr, { lnum = lnum }))
+      --       local new_virt_text_state = not has_diagnostics and og_virt_text or false
+      --
+      --       -- 4. 性能优化：只有在配置确实需要变化时才调用 config
+      --       -- config() 是全局刷新，非常昂贵，且容易触发无效 buffer 的 Bug
+      --       -- 修复：通过传入 bufnr 参数，仅针对当前 buffer 修改配置，避免全局刷新
+      --       local current_state = vim.diagnostic.config(nil, bufnr).virtual_text
+      --       if vim.inspect(current_state) ~= vim.inspect(new_virt_text_state) then
+      --         -- 使用 pcall 屏蔽 Neovim 内部刷新无效缓冲区时的错误 (Invalid buffer id)
+      --         pcall(vim.diagnostic.config, { virtual_text = new_virt_text_state }, bufnr)
+      --       end
+      --     end,
+      --   },
+      --   -- {
+      --   --   event = "ModeChanged",
+      --   --   callback = function()
+      --   --     local bufnr = vim.api.nvim_get_current_buf()
+      --   --     if require("astrocore.buffer").is_valid(bufnr) then
+      --   --       -- 同样使用 pcall 保证稳定性
+      --   --       pcall(vim.diagnostic.show, nil, bufnr)
+      --   --     end
+      --   --   end,
+      --   -- },
+      -- },
+      -- insert_level_auto_save = {
+      --   {
+      --     event = { "InsertLeave", "TextChanged" },
+      --     pattern = { "*" },
+      --     command = "silent! wall",
+      --     nested = true,
+      --   },
+      -- },
+      -- sync_outer_change = {
+      --   {
+      --     event = { "BufEnter", "CursorHold", "CursorHoldI", "FocusGained" },
+      --     callback = function()
+      --       if vim.fn.mode() ~= "c" then
+      --         vim.schedule(function()
+      --           -- 增加对无效 buffer 和特殊窗口的过滤，进一步防止 E565
+      --           local bufnr = vim.api.nvim_get_current_buf()
+      --           if not vim.api.nvim_buf_is_valid(bufnr) or vim.bo[bufnr].buftype == "terminal" then return end
+      --           pcall(vim.cmd, "checktime")
+      --         end)
+      --       end
+      --     end,
+      --     pattern = { "*" },
+      --   },
+      -- },
       lsp_reload_on_change = {
-        {
-          event = "FileChangedShellPost",
-          callback = function(args)
-            if not vim.api.nvim_buf_is_valid(args.buf) then return end
-            -- 如果缓冲区已经有本地修改，不做任何事，让用户处理冲突
-            if vim.bo[args.buf].modified then return end
-
-            -- 关键优化：不再手动触发 BufReadPost 或任何重型的 LSP 刷新
-            -- 当 checktime 加载新内容后，Neovim 的内置 LSP 监听器会自动、异步地同步变更。
-            -- 我们只做一个轻量级的通知，告知用户文件已同步。
-            vim.schedule(function()
-              if vim.api.nvim_buf_is_valid(args.buf) then
-                vim.notify(
-                  "File updated by external tool.",
-                  vim.log.levels.INFO,
-                  { title = "AstroCore", render = "minimal" }
-                )
-              end
-            end)
-          end,
-        },
+        --   {
+        --     event = "FileChangedShellPost",
+        --     callback = function(args)
+        --       if not vim.api.nvim_buf_is_valid(args.buf) then return end
+        --       -- 如果缓冲区已经有本地修改，不做任何事，让用户处理冲突
+        --       if vim.bo[args.buf].modified then return end
+        --
+        --       -- 关键优化：不再手动触发 BufReadPost 或任何重型的 LSP 刷新
+        --       -- 当 checktime 加载新内容后，Neovim 的内置 LSP 监听器会自动、异步地同步变更。
+        --       -- 我们只做一个轻量级的通知，告知用户文件已同步。
+        --       vim.schedule(function()
+        --         if vim.api.nvim_buf_is_valid(args.buf) then
+        --           vim.notify(
+        --             "File updated by external tool.",
+        --             vim.log.levels.INFO,
+        --             { title = "AstroCore", render = "minimal" }
+        --           )
+        --         end
+        --       end)
+        --     end,
+        --   },
         {
           event = "User",
           pattern = "GitSignsUpdate",
@@ -222,30 +244,30 @@ return {
         --   end,
         -- },
       },
-      smoothcursor_mod_change = {
-        {
-          event = { "ModeChanged" },
-          callback = function()
-            local current_mode = vim.fn.mode()
-            if current_mode == "n" then
-              vim.api.nvim_set_hl(0, "SmoothCursor", { fg = "#FFD400" })
-              vim.fn.sign_define("smoothcursor", { text = "󰒊 " })
-            elseif current_mode == "v" then
-              vim.api.nvim_set_hl(0, "SmoothCursorYellow", { fg = "#FFFF00" })
-              vim.fn.sign_define("smoothcursor", { text = "󰒅 " })
-            elseif current_mode == "V" then
-              vim.api.nvim_set_hl(0, "SmoothCursorAqua", { fg = "#00FFFF" })
-              vim.fn.sign_define("smoothcursor", { text = " " })
-            elseif current_mode == "^V" then
-              vim.api.nvim_set_hl(0, "SmoothCursorRed", { fg = "#FF0000" })
-              vim.fn.sign_define("smoothcursor", { text = "󱊁 " })
-            elseif current_mode == "i" then
-              vim.api.nvim_set_hl(0, "SmoothCursorOrange", { fg = "#FFA500" })
-              vim.fn.sign_define("smoothcursor", { text = "󱦹 " })
-            end
-          end,
-        },
-      },
+      -- smoothcursor_mod_change = {
+      --   {
+      --     event = { "ModeChanged" },
+      --     callback = function()
+      --       local current_mode = vim.fn.mode()
+      --       if current_mode == "n" then
+      --         vim.api.nvim_set_hl(0, "SmoothCursor", { fg = "#FFD400" })
+      --         vim.fn.sign_define("smoothcursor", { text = "󰒊 " })
+      --       elseif current_mode == "v" then
+      --         vim.api.nvim_set_hl(0, "SmoothCursorYellow", { fg = "#FFFF00" })
+      --         vim.fn.sign_define("smoothcursor", { text = "󰒅 " })
+      --       elseif current_mode == "V" then
+      --         vim.api.nvim_set_hl(0, "SmoothCursorAqua", { fg = "#00FFFF" })
+      --         vim.fn.sign_define("smoothcursor", { text = " " })
+      --       elseif current_mode == "^V" then
+      --         vim.api.nvim_set_hl(0, "SmoothCursorRed", { fg = "#FF0000" })
+      --         vim.fn.sign_define("smoothcursor", { text = "󱊁 " })
+      --       elseif current_mode == "i" then
+      --         vim.api.nvim_set_hl(0, "SmoothCursorOrange", { fg = "#FFA500" })
+      --         vim.fn.sign_define("smoothcursor", { text = "󱦹 " })
+      --       end
+      --     end,
+      --   },
+      -- },
     },
     -- vim options can be configured here
     options = {
