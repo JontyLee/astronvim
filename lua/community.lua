@@ -11,6 +11,44 @@ return {
   --  ╭──────────────────────────────────────────────────────────╮
   --  │                           ai                             │
   --  ╰──────────────────────────────────────────────────────────╯
+  { import = "astrocommunity.ai.sidekick-nvim" },
+  {
+    "folke/sidekick.nvim",
+    opts = {
+      nes = {
+        enabled = false,
+      },
+      cli = {
+        mux = {
+          backend = "zellij",
+          enabled = true,
+        },
+      },
+    },
+    specs = {
+      {
+        "folke/snacks.nvim",
+        optional = true,
+        opts = {
+          picker = {
+            actions = {
+              sidekick_send = function(...) return require("sidekick.cli.picker.snacks").send(...) end,
+            },
+            win = {
+              input = {
+                keys = {
+                  ["<a-a>"] = {
+                    "sidekick_send",
+                    mode = { "n", "i" },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
   --  ╭──────────────────────────────────────────────────────────╮
   --  │                      bars-and-lines                      │
   --  ╰──────────────────────────────────────────────────────────╯
@@ -59,7 +97,7 @@ return {
   { import = "astrocommunity.editing-support.auto-save-nvim" },
   { import = "astrocommunity.editing-support.comment-box-nvim" },
   { import = "astrocommunity.editing-support.hypersonic-nvim" },
-  { import = "astrocommunity.editing-support.mcphub-nvim" },
+  -- { import = "astrocommunity.editing-support.mcphub-nvim" },
   { import = "astrocommunity.editing-support.rainbow-delimiters-nvim" },
   { import = "astrocommunity.editing-support.quick-scope" },
   { import = "astrocommunity.editing-support.suda-vim" },

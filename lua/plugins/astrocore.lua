@@ -366,7 +366,9 @@ return {
         },
         -- better buffer navigation
         ["<Tab>"] = {
-          function() require("snacks").picker.buffers() end,
+          function()
+            vim.schedule(function() require("snacks").picker.buffers() end)
+          end,
           desc = "Switch Buffers",
         },
 
